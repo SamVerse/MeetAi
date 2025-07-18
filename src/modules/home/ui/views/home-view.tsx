@@ -21,7 +21,7 @@ export const HomeView = () => {
     <div>
         <h1>Welcome, {session.user.name}!</h1>
         <p>Email: {session.user.email}</p>
-        <Button onClick={() => authClient.signOut({
+        <Button className='bg-primary text-primary-foreground' onClick={() => authClient.signOut({
             fetchOptions: {
                 onSuccess: () => router.push('/sign-in'),
                 onError: (error) => console.error('Sign out failed:', error),
