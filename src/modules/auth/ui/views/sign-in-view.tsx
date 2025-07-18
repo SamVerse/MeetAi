@@ -5,8 +5,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OctagonAlertIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {FaGithub, FaGoogle} from 'react-icons/fa';
 
 // All imports from local files
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const signInSchema = z.object({
   email: z.email("Invalid email address"),
@@ -32,6 +33,7 @@ const signInSchema = z.object({
 
 export const SignInView = () => {
   const router = useRouter();
+
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -51,11 +53,12 @@ export const SignInView = () => {
         {
           email: data.email,
           password: data.password,
+          callbackURL: '/',
         },
         {
           onSuccess: () => {
-            router.push("/");
             setPending(false);
+            router.push('/');
           },
           onError: ({ error }) => {
             setError(error.message);
@@ -69,6 +72,32 @@ export const SignInView = () => {
       setPending(false);
     }
   };
+
+  const onSocialSignIn = (provider: "google" | "github") => {
+      setError(null);
+      setPending(true);
+      try {
+        authClient.signIn.social(
+          {
+            provider,
+            callbackURL:'/',
+          },
+          {
+            onSuccess: () => {
+              setPending(false);
+              },
+            onError: ({ error }) => {
+              setError(error.message);
+              setPending(false);
+            },
+          }
+        );
+      } catch (error) {
+        setError("An unexpected error occurred. Please try again later.");
+        console.error("Sign-in error:", error);
+        setPending(false);
+      }
+    };
 
   return (
     <div className="flex flex-col gap-6">
@@ -110,10 +139,7 @@ export const SignInView = () => {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <PasswordInput
-                            placeholder="********"
-                            {...field}
-                          />
+                          <PasswordInput placeholder="********" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -138,11 +164,23 @@ export const SignInView = () => {
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <Button disabled={pending} variant="outline" type="button" className="w-full">
-                    Google
+                  <Button
+                    onClick={() => onSocialSignIn("google")}
+                    disabled={pending}
+                    variant="outline"
+                    type="button"
+                    className="w-full"
+                  >
+                    <FaGoogle />
                   </Button>
-                  <Button disabled={pending} variant="outline" type="button" className="w-full">
-                    GitHub
+                  <Button
+                    onClick={() => onSocialSignIn("github")}
+                    disabled={pending}
+                    variant="outline"
+                    type="button"
+                    className="w-full"
+                  >
+                    <FaGithub />
                   </Button>
                 </div>
                 <div className="text-center text-sm">
