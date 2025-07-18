@@ -4,9 +4,10 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OctagonAlertIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form"; 
 import { useState } from "react";
+import {FaGithub, FaGoogle} from 'react-icons/fa';
+
 
 // All imports from local files
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const signUpSchema = z
   .object({
@@ -44,6 +46,7 @@ const signUpSchema = z
 
 export const SignUpView = () => {
   const router = useRouter();
+
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -66,11 +69,12 @@ export const SignUpView = () => {
           name: data.name,
           email: data.email,
           password: data.password,
+          callbackURL: '/',
         },
         {
           onSuccess: () => {
-            router.push("/");
             setPending(false);
+            router.push('/');
           },
           onError: ({ error }) => {
             setError(error.message);
@@ -81,6 +85,32 @@ export const SignUpView = () => {
     } catch (error) {
       setError("An unexpected error occurred. Please try again later.");
       console.error("Sign-up error:", error);
+      setPending(false);
+    }
+  };
+
+  const onSocialSignIn = (provider: "google" | "github") => {
+    setError(null);
+    setPending(true);
+    try {
+      authClient.signIn.social(
+        {
+          provider,
+          callbackURL: '/',
+        },
+        {
+          onSuccess: () => {
+            setPending(false);
+          },
+          onError: ({ error }) => {
+            setError(error.message);
+            setPending(false);
+          },
+        }
+      );
+    } catch (error) {
+      setError("An unexpected error occurred. Please try again later.");
+      console.error("Sign-in error:", error);
       setPending(false);
     }
   };
@@ -190,20 +220,22 @@ export const SignUpView = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <Button
+                      onClick={() => onSocialSignIn("google")}
                       disabled={pending}
                       variant="outline"
                       type="button"
                       className="w-full"
                     >
-                      Google
+                      <FaGoogle />
                     </Button>
                     <Button
+                      onClick={() => onSocialSignIn("github")}
                       disabled={pending}
                       variant="outline"
                       type="button"
                       className="w-full"
                     >
-                      GitHub
+                      <FaGithub />
                     </Button>
                   </div>
                   <div className="text-center text-sm">
