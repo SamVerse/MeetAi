@@ -18,7 +18,7 @@ import {
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
-import { DashboardUserButton } from "./dashboard-user-component";
+import { DashboardUserButton } from "./dashboard-user-button";
 
 const firstSection = [
   {
