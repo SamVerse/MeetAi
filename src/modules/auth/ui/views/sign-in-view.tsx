@@ -27,7 +27,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const signInSchema = z.object({
-  email: z.email("Invalid email address"),
+  email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password is required"),
 });
 
